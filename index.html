@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thumbs Up API Client</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        .container {
+            margin: 20px;
+        }
+        input {
+            margin-bottom: 10px;
+            padding: 8px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        button {
+            padding: 10px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Thumbs Up API Client</h1>
+        <input type="text" id="eventId" placeholder="Event ID">
+        <input type="text" id="userId" placeholder="User Name">
+        <button onclick="addThumbsUp()">Thumbs Up</button>
+        <h2>Event Info</h2>
+        <div id="eventInfo"></div>
+    </div>
+
+    <script>
+        const apiUrl = 'https://fistbump-h2xe.onrender.com/api/thumbs-up';
+
+        async function addThumbsUp() {
+            const eventId = document.getElementById('eventId').value;
+            const userId = document.getElementById('userId').value;
+
+            if (!eventId || !userId) {
+                alert('Please enter both Event ID and User Name');
+                return;
+            }
+
+            try {
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ eventId, userId }),
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    displayEventInfo(eventId);
+                } else {
+                    alert(`Error: ${data.error}`);
+                }
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
+
+        async function displayEventInfo(eventId) {
+            try {
+                const response = await fetch(`${apiUrl}/${eventId}`);
+                const data = await response.json();
+
+                if (response.ok) {
+                    document.getElementById('eventInfo').innerHTML = `
+                        <p><strong>Event ID:</strong> ${data.eventId}</p>
+                        <p><strong>Thumbs Up Count:</strong> ${data.count}</p>
+                        <p><strong>Users:</strong> ${data.users.join(', ')}</p>
+                    `;
+                } else {
+                    document.getElementById('eventInfo').innerHTML = `<p>Error: ${data.error}</p>`;
+                }
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
+    </script>
+</body>
+</html>
