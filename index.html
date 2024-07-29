@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Thumbs Up Button</title>
     <script>
-        async function thumbsUp() {
+        function thumbsUp() {
             const eventId = document.getElementById('eventId').value;
             const userName = document.getElementById('userName').value;
 
@@ -14,19 +14,31 @@
                 return;
             }
 
-            const response = await fetch('https://fistbump-h2xe.onrender.com/thumbsUp', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ eventId, userName })
-            });
+            // Call the async function to handle the API request
+            sendThumbsUp(eventId, userName);
+        }
 
-            const result = await response.json();
-            if (response.ok) {
+        async function sendThumbsUp(eventId, userName) {
+            try {
+                const response = await fetch('https://fistbump-h2xe.onrender.com/thumbsUp', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ eventId, userName })
+                });
+
+                if (!response.ok) {
+                    const result = await response.json();
+                    alert(`Error: ${result.error}`);
+                    return;
+                }
+
+                const result = await response.json();
                 alert('Thumbs up recorded successfully');
-            } else {
-                alert(`Error: ${result.error}`);
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Failed to send thumbs up. Check the console for more details.');
             }
         }
     </script>
